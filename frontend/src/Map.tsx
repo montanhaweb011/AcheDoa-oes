@@ -10,6 +10,7 @@ import { useEffect, useState, useRef } from "react";
 import type { CircleMarker as LeafletCircle } from "leaflet";
 import { Link } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
+import GoogleMap from "./GoogleMap";
 function Focus({
   selected,
   items,
@@ -40,7 +41,25 @@ function Pick({ onPick }: { onPick: (lat: number, lng: number) => void }) {
   useMapEvents({ click: (e) => onPick(e.latlng.lat, e.latlng.lng) });
   return null;
 }
-export default function Map({
+const googleMapsEnabled = Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY?.trim());
+
+type MapProps = {
+  items: any[];
+  selected?: string;
+  onSelect?: (id: string) => void;
+  location?: number[];
+  onPick?: (lat: number, lng: number) => void;
+};
+
+export default function Map(props: MapProps) {
+  const [googleFailed, setGoogleFailed] = useState(false);
+  if (googleMapsEnabled && !googleFailed) {
+    return <GoogleMap {...props} onError={() => setGoogleFailed(true)} />;
+  }
+  return <OpenStreetMap {...props} />;
+}
+
+function OpenStreetMap({
   items,
   selected = "",
   onSelect = () => {},
