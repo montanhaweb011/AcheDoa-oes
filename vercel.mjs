@@ -1,12 +1,8 @@
-// Configure API_PROXY_ORIGIN na Vercel com a URL HTTPS do backend
-// (sem barra final), por exemplo https://meu-backend.onrender.com.
-const raw = process.env.API_PROXY_ORIGIN?.trim().replace(/\/$/, "");
-if (!raw || !/^https:\/\/[^\s/]+$/i.test(raw)) {
-  throw new Error(
-    "Defina API_PROXY_ORIGIN (https://seu-backend) nas variáveis da Vercel. " +
-      "O AcheDoações depende de uma API e banco persistente.",
-  );
-}
+// Hospeda apenas o frontend na Vercel. A API e o SQLite precisam ficar em
+// outro serviço com armazenamento persistente (consulte GUIA-GITHUB-VERCEL.md).
+// Na Vercel, defina API_PROXY_ORIGIN com a URL HTTPS do backend, sem /api.
+const apiOrigin = (process.env.API_PROXY_ORIGIN || "").trim().replace(/\/+$/, "");
+const apiReady = /^https:\/\/[^\s/]+$/i.test(apiOrigin);
 
 export const config = {
   framework: "vite",
@@ -14,7 +10,11 @@ export const config = {
   buildCommand: "npm run build -w frontend",
   outputDirectory: "frontend/dist",
   rewrites: [
-    { source: "/api/:path*", destination: `${raw}/api/:path*` },
+    // A configuração precisa ser válida até durante a importação inicial,
+    // quando as variáveis de ambiente podem ainda não ter sido cadastradas.
+    ...(apiReady
+      ? [{ source: "/api/:path*", destination: `${apiOrigin}/api/:path*` }]
+      : []),
     { source: "/:path*", destination: "/index.html" },
   ],
 };
