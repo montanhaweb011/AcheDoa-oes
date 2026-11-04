@@ -5,6 +5,7 @@ import { rateLimit } from "express-rate-limit";
 import bcrypt from "bcryptjs";
 import { randomBytes, createHash } from "node:crypto";
 import { resolve } from "node:path";
+import { existsSync } from "node:fs";
 import { z, ZodError } from "zod";
 import { db } from "./db.js";
 import {
@@ -33,11 +34,34 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "https://*.tile.openstreetmap.org"],
-        connectSrc: ["'self'"],
-        fontSrc: ["'self'"],
+        // Necessário quando o frontend completo é servido pela Render:
+        // Maps JavaScript API carrega scripts, imagens e chamadas externas.
+        scriptSrc: [
+          "'self'",
+          "https://maps.googleapis.com",
+          "https://maps.gstatic.com",
+        ],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "blob:",
+          "https://*.tile.openstreetmap.org",
+          "https://maps.googleapis.com",
+          "https://maps.gstatic.com",
+          "https://*.google.com",
+          "https://*.googleapis.com",
+          "https://*.gstatic.com",
+          "https://*.ggpht.com",
+        ],
+        connectSrc: [
+          "'self'",
+          "https://maps.googleapis.com",
+          "https://maps.gstatic.com",
+          "https://*.googleapis.com",
+        ],
+        fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
+        frameSrc: ["https://www.google.com"],
         upgradeInsecureRequests:
           process.env.NODE_ENV === "production" ? [] : null,
       },
@@ -802,9 +826,15 @@ app.get(
 app.use("/api", (req, res) =>
   res.status(404).json({ error: "Rota não encontrada" }),
 );
-app.use(express.static(resolve(process.cwd(), "../frontend/dist")));
-app.get("*", (req, res) =>
-  res.sendFile(resolve(process.cwd(), "../frontend/dist/index.html")),
+// No deploy Render, process.cwd() é a raiz do monorepo; no desenvolvimento
+// local, pode ser a pasta backend. Resolva ambos sem acessar fora do projeto.
+const frontendDistFromRoot = resolve(process.cwd(), "frontend/dist");
+const frontendDist = existsSync(frontendDistFromRoot)
+  ? frontendDistFromRoot
+  : resolve(process.cwd(), "../frontend/dist");
+app.use(express.static(frontendDist));
+app.get("*", (_req, res) =>
+  res.sendFile(resolve(frontendDist, "index.html")),
 );
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof ZodError) {
