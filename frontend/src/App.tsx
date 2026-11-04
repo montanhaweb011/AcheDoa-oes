@@ -1176,9 +1176,9 @@ function Editorial({ page }: { page: string }) {
           <p>
             Um cookie HttpOnly mantém sua sessão por até sete dias. A
             localização só é solicitada ao usar “Perto de mim” e é calculada no
-            navegador, sem armazenamento no servidor. O mapa utiliza tiles do
-            OpenStreetMap, cujo provedor recebe requisições de rede para exibir
-            a região.
+            navegador, sem armazenamento no servidor. O mapa utiliza Google Maps quando a API está configurada ou
+            OpenStreetMap como alternativa. O provedor do mapa recebe
+            requisições do navegador para exibir a região.
           </p>
           <h2>Ambiente local e contato</h2>
           <p>
