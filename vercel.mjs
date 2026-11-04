@@ -15,6 +15,7 @@ export const config = {
     ...(apiReady
       ? [{ source: "/api/:path*", destination: `${apiOrigin}/api/:path*` }]
       : []),
-    { source: "/:path*", destination: "/index.html" },
+    // Impede fallback SPA em /api sem backend ativo (HTML 200 quebrava o React).
+    { source: "/((?!api(?:/|$)).*)", destination: "/index.html" },
   ],
 };
