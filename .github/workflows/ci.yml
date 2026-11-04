@@ -1,0 +1,26 @@
+name: Verificar AcheDoacoes
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Obter codigo
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Instalar dependencias
+        run: npm ci
+      - name: Preparar banco de testes
+        run: npm run setup
+      - name: Testar backend
+        run: npm test
+      - name: Compilar frontend e backend
+        run: npm run build
