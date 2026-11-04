@@ -333,7 +333,7 @@ function Home() {
         <div className="demo-banner">{demoText}</div>
         <State data={data} error={error} />
         <div className="grid three">
-          {data?.items.slice(0, 3).map((p: any) => (
+          {data?.items?.slice(0, 3).map((p: any) => (
             <PointCard p={p} key={p.id} />
           ))}
         </div>
@@ -349,7 +349,7 @@ function Home() {
           </Link>
         </div>
         <div className="grid three">
-          {camps.data?.items.map((c: any) => (
+          {camps.data?.items?.map((c: any) => (
             <CampaignCard c={c} key={c.id} />
           ))}
         </div>
