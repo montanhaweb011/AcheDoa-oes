@@ -1,0 +1,24 @@
+{
+  "name": "achedoacoes",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs && npm run db:migrate && npm run db:seed",
+    "dev": "node scripts/dev.mjs",
+    "db:migrate": "npm run db:migrate -w backend",
+    "db:seed": "npm run db:seed -w backend",
+    "build": "npm run build -w backend && npm run build -w frontend",
+    "test": "npm test -w backend",
+    "start": "npm start -w backend",
+    "start:prod": "npm run db:migrate && npm start"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10"
+  }
+}

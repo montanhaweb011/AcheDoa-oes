@@ -1,0 +1,23 @@
+# Render Blueprint: site completo (React + Express + SQLite persistente).
+# O plano "starter" com disco persistente é pago; não use disco efêmero.
+services:
+  - type: web
+    name: achedoacoes
+    runtime: node
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start:prod
+    healthCheckPath: /api/health
+    disk:
+      name: achedoacoes-dados
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: file:/var/data/achedoacoes.db
+      # Adicione APP_ORIGINS no painel caso use um frontend Vercel.
+      # RENDER_EXTERNAL_URL é fornecida automaticamente pela Render.
