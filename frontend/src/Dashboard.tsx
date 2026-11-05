@@ -502,7 +502,7 @@ function PointForm({
         <input
           type="checkbox"
           name="isDemo"
-          defaultChecked={item.isDemo ?? true}
+          defaultChecked={item.isDemo ?? false}
         />{" "}
         Este é um local fictício de demonstração
       </label>

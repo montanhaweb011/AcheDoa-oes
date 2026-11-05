@@ -1,7 +1,17 @@
 :root {
+  color-scheme: light;
+  --text: #26332d;
+  --page: #f8f6f0;
+  --surface: #ffffff;
+  --soft: #e7ece2;
+  --input-border: #bfc6bc;
+  --warning-line: #ddcaa6;
+  --warning-bg: #f4edde;
+  --warning-text: #6b5333;
+  --danger: #98472e;
   font-family: Arial, Helvetica, sans-serif;
-  color: #26332d;
-  background: #f8f6f0;
+  color: var(--text);
+  background: var(--page);
   font-synthesis: none;
   --green: #174f3d;
   --dark: #103b2f;
@@ -59,10 +69,10 @@ input,
 select,
 textarea {
   padding: 12px;
-  border: 1px solid #bfc6bc;
+  border: 1px solid var(--input-border);
   border-radius: 5px;
-  background: #fff;
-  color: #26332d;
+  background: var(--surface);
+  color: var(--text);
   max-width: 100%;
 }
 textarea {
@@ -199,14 +209,14 @@ nav .account {
 }
 .lead {
   font-size: 17px;
-  color: #586158;
+  color: var(--muted);
   max-width: 500px;
 }
 .hero-search {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 7px 7px 7px 17px;
@@ -291,9 +301,9 @@ nav .account {
   display: grid;
   grid-template-columns: 1.25fr 1fr 1fr 1fr;
   gap: 45px;
-  background: #e7ece2;
+  background: var(--soft);
   padding: 46px max(5%, calc((100vw - 1296px) / 2));
-  border-block: 1px solid #d7dfd1;
+  border-block: 1px solid var(--line);
 }
 .steps h2 {
   font-size: 29px;
@@ -305,7 +315,7 @@ nav .account {
 }
 .steps p {
   font-size: 13px;
-  color: #626c61;
+  color: var(--muted);
   margin-bottom: 0;
 }
 .steps h3 {
@@ -314,7 +324,7 @@ nav .account {
 }
 .step-number {
   font: italic 25px Georgia;
-  color: #69816a;
+  color: var(--muted);
   display: block;
   margin-bottom: 17px;
 }
@@ -353,9 +363,9 @@ nav .account {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .demo-banner {
-  border: 1px solid #ddcaa6;
-  background: #f4edde;
-  color: #6b5333;
+  border: 1px solid var(--warning-line);
+  background: var(--warning-bg);
+  color: var(--warning-text);
   padding: 13px 17px;
   font-size: 12px;
   line-height: 1.6;
@@ -367,20 +377,20 @@ nav .account {
   font-size: 8px;
   font-weight: bold;
   letter-spacing: 0.6px;
-  color: #795833;
+  color: var(--warning-text);
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #f6edde;
+  background: var(--warning-bg);
   padding: 6px 7px;
   border-radius: 3px;
 }
 .verified {
   color: var(--green);
-  background: #e7efe7;
+  background: var(--soft);
 }
 .point-card {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 23px;
@@ -389,7 +399,7 @@ nav .account {
 .point-card.selected {
   border: 2px solid var(--green);
   padding: 22px;
-  background: #f0f5ee;
+  background: var(--soft);
 }
 .point-card .eyebrow {
   font-size: 9px;
@@ -417,13 +427,13 @@ nav .account {
 }
 .tags span {
   font-size: 10px;
-  background: #eff3eb;
-  color: #436447;
+  background: var(--soft);
+  color: var(--muted);
   padding: 6px 9px;
   border-radius: 3px;
 }
 .card-bottom {
-  border-top: 1px solid #e7e9e1;
+  border-top: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
   gap: 8px;
@@ -461,30 +471,30 @@ nav .account {
   padding: 6px;
 }
 .icon-button:hover {
-  background: #e7efe7;
+  background: var(--soft);
 }
 .campaigns-home {
-  background: #f0eee5;
+  background: var(--soft);
   max-width: none;
 }
 .campaign-card {
   border: 1px solid var(--line);
-  background: white;
+  background: var(--surface);
   border-radius: 7px;
   overflow: hidden;
 }
 .campaign-visual {
   height: 140px;
-  background: #d8decb;
-  color: #506c4e;
+  background: var(--soft);
+  color: var(--green);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .campaign-card:nth-child(2n) .campaign-visual {
-  background: #e4c4ae;
-  color: #9b6348;
+  background: var(--warning-bg);
+  color: var(--warning-text);
 }
 .campaign-visual > span {
   position: absolute;
@@ -547,7 +557,7 @@ nav .account {
   margin: 10px 5% 70px;
   padding: 50px;
   background: var(--green);
-  color: #fff;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -565,12 +575,12 @@ nav .account {
   color: #d3ded1;
 }
 .light {
-  background: #f5f3e9;
+  background: var(--surface);
   color: var(--green);
   border: 0;
 }
 .light:hover {
-  background: white;
+  background: var(--surface);
 }
 footer {
   padding: 45px 5%;
@@ -607,8 +617,8 @@ footer > p {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: white;
-  border: 1px solid #bfc6bc;
+  background: var(--surface);
+  border: 1px solid var(--input-border);
   border-radius: 6px;
   flex: 1;
   padding-left: 12px;
@@ -626,10 +636,10 @@ footer > p {
 .outline {
   color: var(--green);
   background: transparent;
-  border-color: #bec8ba;
+  border-color: var(--line);
 }
 .outline:hover {
-  background: #e7efe7;
+  background: var(--soft);
 }
 .filter-details {
   display: flex;
@@ -649,8 +659,8 @@ footer > p {
 }
 .chips button {
   background: transparent;
-  color: #5b665a;
-  border: 1px solid #cbd2c5;
+  color: var(--muted);
+  border: 1px solid var(--line);
   font-size: 11px;
   padding: 9px 13px;
   border-radius: 30px;
@@ -693,7 +703,7 @@ footer > p {
 .map-warning {
   position: absolute;
   z-index: 1000;
-  background: #fff5df;
+  background: var(--warning-bg);
   top: 5px;
   left: 10px;
   right: 10px;
@@ -714,7 +724,7 @@ footer > p {
 }
 .detail-aside {
   padding: 20px;
-  background: #eaf0e5;
+  background: var(--soft);
   border-radius: 8px;
 }
 .detail-aside .map-wrap {
@@ -739,7 +749,7 @@ footer > p {
   padding: 20px 0;
 }
 .panel {
-  background: white;
+  background: var(--surface);
   padding: 28px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -761,7 +771,7 @@ footer > p {
   width: 100%;
 }
 .notice {
-  background: #e7eee2;
+  background: var(--soft);
   border-left: 3px solid var(--green);
   padding: 14px;
   margin: 16px 0;
@@ -830,7 +840,7 @@ details p {
 .dashboard > aside {
   border-right: 1px solid var(--line);
   padding: 35px 22px;
-  background: #eff1e8;
+  background: var(--soft);
 }
 .dashboard > aside h2 {
   font-size: 25px;
@@ -840,7 +850,7 @@ details p {
   width: 100%;
   background: transparent;
   border: 0;
-  color: #4b5c4c;
+  color: var(--muted);
   text-align: left;
   justify-content: flex-start;
   margin: 5px 0;
@@ -863,7 +873,7 @@ details p {
 }
 table {
   border-collapse: collapse;
-  background: #fff;
+  background: var(--surface);
   width: 100%;
   font-size: 12px;
 }
@@ -874,7 +884,7 @@ td {
   border-bottom: 1px solid var(--line);
 }
 th {
-  background: #edf1e7;
+  background: var(--soft);
   color: var(--green);
 }
 td strong,
@@ -897,12 +907,12 @@ td span {
   font-size: 11px;
 }
 .danger {
-  background: #fff;
-  color: #98472e;
-  border: 1px solid #d9b4a7;
+  background: var(--surface);
+  color: var(--danger);
+  border: 1px solid var(--warning-line);
 }
 .danger:hover {
-  background: #f8e4da;
+  background: var(--warning-bg);
 }
 .metrics {
   display: grid;
@@ -911,7 +921,7 @@ td span {
 }
 .metrics > div {
   padding: 20px;
-  background: #e7eee2;
+  background: var(--soft);
   border-radius: 6px;
   display: flex;
   flex-direction: column;
@@ -963,7 +973,7 @@ legend {
   position: fixed;
   top: -90px;
   left: 10px;
-  background: white;
+  background: var(--surface);
   z-index: 3000;
   padding: 12px;
 }
@@ -1031,7 +1041,7 @@ legend {
     top: 76px;
     left: 0;
     right: 0;
-    background: #f8f6f0;
+    background: var(--page);
     box-shadow: 0 8px 12px #0001;
     padding: 24px;
     align-items: stretch;
@@ -1198,9 +1208,102 @@ legend {
 }
 
 /* Google Maps: mantém dimensões e identidade visual do mapa existente. */
-.google-map-canvas { width: 100%; height: 100%; min-height: 360px; }
-.google-map-pin { width: 20px; height: 20px; border: 3px solid #fff; border-radius: 50%; background: #174f3d; box-shadow: 0 1px 6px #0005; cursor: pointer; }
-.google-map-pin.selected { width: 28px; height: 28px; background: #b66747; }
-.google-map-popup { font-family: inherit; max-width: 220px; }
-.google-map-popup strong { display: block; margin-bottom: 6px; }
-.google-map-popup p { margin: 4px 0 8px; }
+.google-map-canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+}
+.google-map-pin {
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--surface);
+  border-radius: 50%;
+  background: #174f3d;
+  box-shadow: 0 1px 6px #0005;
+  cursor: pointer;
+}
+.google-map-pin.selected {
+  width: 28px;
+  height: 28px;
+  background: #b66747;
+}
+.google-map-popup {
+  font-family: inherit;
+  max-width: 220px;
+}
+.google-map-popup strong {
+  display: block;
+  margin-bottom: 6px;
+}
+.google-map-popup p {
+  margin: 4px 0 8px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --text: #e8eee9;
+  --page: #111a16;
+  --surface: #1b2922;
+  --soft: #23372c;
+  --green: #91d8b2;
+  --dark: #bbebcf;
+  --line: #3a5042;
+  --input-border: #58715f;
+  --muted: #b2c2b6;
+  --terra: #e4a07e;
+  --warning-line: #766244;
+  --warning-bg: #3b3023;
+  --warning-text: #f1d6a6;
+  --danger: #ffb49c;
+}
+.theme-toggle {
+  flex-shrink: 0;
+  padding: 10px;
+  background: transparent;
+  color: var(--green);
+  border-color: var(--line);
+}
+.theme-toggle:hover {
+  background: var(--soft);
+}
+:root[data-theme="dark"]
+  button:not(.theme-toggle):not(.chips button):not(.icon-button):not(
+    .danger
+  ):not(.outline),
+:root[data-theme="dark"] .button:not(.outline):not(.light),
+:root[data-theme="dark"] .chips button.active {
+  background: #235e43;
+  color: #fff;
+}
+:root[data-theme="dark"] .institution-cta {
+  background: #235e43;
+}
+:root[data-theme="dark"] .image-caption {
+  color: #103b2f;
+}
+:root[data-theme="dark"] .floating-note {
+  color: #174f3d;
+}
+:root[data-theme="dark"] .leaflet-popup-content-wrapper,
+:root[data-theme="dark"] .leaflet-popup-tip,
+:root[data-theme="dark"] .leaflet-bar a,
+:root[data-theme="dark"] .leaflet-control-attribution {
+  background: var(--surface);
+  color: var(--text);
+}
+:root[data-theme="dark"] .google-map-popup {
+  color: #26332d;
+}
+@media (max-width: 1200px) {
+  .theme-toggle span {
+    display: none;
+  }
+  header {
+    gap: 14px;
+  }
+}
+@media (max-width: 900px) {
+  .theme-toggle {
+    margin-left: auto;
+  }
+}

@@ -14,9 +14,11 @@
     "db:migrate": "npm run db:migrate -w backend",
     "db:seed": "npm run db:seed -w backend",
     "build": "npm run build -w backend && npm run build -w frontend",
-    "test": "npm test -w backend",
+    "test": "npm test -w backend && node --test frontend/tests/*.test.mjs",
     "start": "npm start -w backend",
-    "start:prod": "npm run db:migrate && npm start"
+    "start:prod": "npm run db:migrate && npm start",
+    "build:vercel": "node scripts/build-vercel.mjs",
+    "db:deploy:vercel": "npm exec -w backend -- prisma migrate deploy --schema prisma-postgres/schema.prisma && npm exec -w backend -- prisma generate --schema prisma-postgres/schema.prisma && npm run db:categories -w backend"
   },
   "devDependencies": {
     "prettier": "^3.9.10"

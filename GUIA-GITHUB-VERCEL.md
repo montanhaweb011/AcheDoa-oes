@@ -1,3 +1,5 @@
+> Para a configuração atual com API na própria Vercel, siga [GUIA-VERCEL-COMPLETO.md](GUIA-VERCEL-COMPLETO.md). O fluxo de proxy abaixo descreve a configuração anterior.
+
 # AcheDoações — enviar para GitHub e publicar
 
 ## 1. Enviar os arquivos ao GitHub

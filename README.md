@@ -1,3 +1,5 @@
+> **Vercel com frontend + API:** consulte [GUIA-VERCEL-COMPLETO.md](GUIA-VERCEL-COMPLETO.md). As instruções antigas de proxy para Render abaixo são apenas uma alternativa de hospedagem.
+
 # AcheDoações
 
 **Quer subir no GitHub e publicar?** Leia [GUIA-GITHUB-VERCEL.md](GUIA-GITHUB-VERCEL.md). O repositório inclui verificação via GitHub Actions, deploy de site completo na Render e opção de frontend na Vercel com API persistente.

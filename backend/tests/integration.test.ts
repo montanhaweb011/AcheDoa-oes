@@ -15,6 +15,9 @@ async function request(
   session?: any,
   extra: any = {},
 ) {
+  // Existing fixtures are explicitly fictitious; production defaults to real points.
+  if (/^\/api\/(points|campaigns)(\?|$)/.test(url) && !url.includes("mode="))
+    url += (url.includes("?") ? "&" : "?") + "mode=demo";
   const headers: any = { "content-type": "application/json", ...extra };
   if (session) {
     headers.cookie = session.cookie;

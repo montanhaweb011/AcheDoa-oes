@@ -15,12 +15,35 @@ import {
   reviewInput,
 } from "./validators.js";
 export const app = express();
+// Vercel is the trusted reverse proxy immediately in front of this function.
+if (process.env.VERCEL) app.set("trust proxy", 1);
+app.use("/api", (_req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  if (process.env.VERCEL && !process.env.DATABASE_URL) {
+    res.status(503).json({
+      error:
+        "Serviço temporariamente indisponível. O banco de dados ainda precisa ser conectado.",
+      code: "DATABASE_NOT_CONFIGURED",
+    });
+    return;
+  }
+  next();
+});
 // Cada origem é explícita: Render recebe a sua URL HTTPS via variável própria.
 // Se o frontend estiver na Vercel, informe também APP_ORIGINS no backend.
 const allowedOrigins = new Set(
   [
     process.env.APP_ORIGIN,
     process.env.RENDER_EXTERNAL_URL,
+    ...(process.env.VERCEL
+      ? [
+          process.env.VERCEL_URL,
+          process.env.VERCEL_PROJECT_PRODUCTION_URL,
+          process.env.VERCEL_BRANCH_URL,
+        ]
+          .filter(Boolean)
+          .map((host) => `https://${host}`)
+      : []),
     ...(process.env.APP_ORIGINS || "").split(","),
     ...(process.env.NODE_ENV !== "production"
       ? ["http://localhost:5173", "http://localhost:3001"]
@@ -96,6 +119,12 @@ const publicCampaign = {
   institution: { status: "APPROVED" },
   point: published,
 };
+const contains = (value: string): any => ({
+  contains: value,
+  ...(/^postgres(ql)?:/.test(process.env.DATABASE_URL || "")
+    ? { mode: "insensitive" }
+    : {}),
+});
 const pagination = (q: any) => ({
   take: 12,
   skip: (Math.max(1, Number(q.page) || 1) - 1) * 12,
@@ -279,22 +308,22 @@ app.get(
       .filter(Boolean);
     const where: any = {
       ...published,
-      isDemo: req.query.mode !== "real",
+      isDemo: req.query.mode === "demo",
       AND: [
         ...(q
           ? [
               {
                 OR: ["name", "city", "neighborhood", "street"]
-                  .map((k) => ({ [k]: { contains: q } }))
-                  .concat([{ institution: { name: { contains: q } } }] as any),
+                  .map((k) => ({ [k]: contains(q) }))
+                  .concat([{ institution: { name: contains(q) } }] as any),
               },
             ]
           : []),
         ...cats.map((categoryId) => ({ categories: { some: { categoryId } } })),
       ],
-      ...(req.query.city ? { city: { contains: String(req.query.city) } } : {}),
+      ...(req.query.city ? { city: contains(String(req.query.city)) } : {}),
       ...(req.query.neighborhood
-        ? { neighborhood: { contains: String(req.query.neighborhood) } }
+        ? { neighborhood: contains(String(req.query.neighborhood)) }
         : {}),
     };
     const [items, total] = await Promise.all([
@@ -326,22 +355,20 @@ app.post(
   wrap(async (req, res) => {
     const inst = await institution(res);
     const { categories, hours, ...data } = pointInput.parse(req.body);
-    res
-      .status(201)
-      .json(
-        await db.collectionPoint.create({
-          data: {
-            ...data,
-            verifiedAt: null,
-            source: data.source,
-            institutionId: inst.id,
-            categories: {
-              create: categories.map((categoryId) => ({ categoryId })),
-            },
-            hours: { create: hours },
+    res.status(201).json(
+      await db.collectionPoint.create({
+        data: {
+          ...data,
+          verifiedAt: null,
+          source: data.source,
+          institutionId: inst.id,
+          categories: {
+            create: categories.map((categoryId) => ({ categoryId })),
           },
-        }),
-      );
+          hours: { create: hours },
+        },
+      }),
+    );
   }),
 );
 app.patch(
@@ -453,7 +480,7 @@ const campaignState = (c: any) => ({
 app.get(
   "/api/campaigns",
   wrap(async (req, res) => {
-    const where = { ...publicCampaign, isDemo: req.query.mode !== "real" };
+    const where = { ...publicCampaign, isDemo: req.query.mode === "demo" };
     const [items, total] = await Promise.all([
       db.campaign.findMany({
         where,
@@ -489,13 +516,11 @@ app.post(
     const point = await owned("collectionPoint", data.pointId, res);
     if (point.institutionId !== inst.id)
       fail(403, "Ponto deve pertencer à instituição");
-    res
-      .status(201)
-      .json(
-        await db.campaign.create({
-          data: { ...data, institutionId: inst.id, isDemo: point.isDemo },
-        }),
-      );
+    res.status(201).json(
+      await db.campaign.create({
+        data: { ...data, institutionId: inst.id, isDemo: point.isDemo },
+      }),
+    );
   }),
 );
 app.patch(
@@ -603,13 +628,11 @@ app.post(
   wrap(async (req, res) => {
     await publicPoint(req.params.id);
     const data = reviewInput.parse(req.body);
-    res
-      .status(201)
-      .json(
-        await db.review.create({
-          data: { ...data, userId: res.locals.user.id, pointId: req.params.id },
-        }),
-      );
+    res.status(201).json(
+      await db.review.create({
+        data: { ...data, userId: res.locals.user.id, pointId: req.params.id },
+      }),
+    );
   }),
 );
 app.patch(
@@ -651,13 +674,11 @@ app.post(
         description: z.string().min(5).max(2000),
       })
       .parse(req.body);
-    res
-      .status(201)
-      .json(
-        await db.informationReport.create({
-          data: { ...data, pointId: req.params.id, userId: res.locals.user.id },
-        }),
-      );
+    res.status(201).json(
+      await db.informationReport.create({
+        data: { ...data, pointId: req.params.id, userId: res.locals.user.id },
+      }),
+    );
   }),
 );
 app.post(
@@ -670,13 +691,11 @@ app.post(
     const r = await db.review.findUnique({ where: { id: req.params.id } });
     if (!r || r.hidden) fail(404, "Avaliação indisponível");
     await publicPoint(r!.pointId);
-    res
-      .status(201)
-      .json(
-        await db.reviewReport.create({
-          data: { reason, reviewId: req.params.id, userId: res.locals.user.id },
-        }),
-      );
+    res.status(201).json(
+      await db.reviewReport.create({
+        data: { reason, reviewId: req.params.id, userId: res.locals.user.id },
+      }),
+    );
   }),
 );
 app.use("/api/admin", auth, admin);
@@ -833,18 +852,14 @@ const frontendDist = existsSync(frontendDistFromRoot)
   ? frontendDistFromRoot
   : resolve(process.cwd(), "../frontend/dist");
 app.use(express.static(frontendDist));
-app.get("*", (_req, res) =>
-  res.sendFile(resolve(frontendDist, "index.html")),
-);
+app.get("*", (_req, res) => res.sendFile(resolve(frontendDist, "index.html")));
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof ZodError) {
-    res
-      .status(400)
-      .json({
-        error: err.issues
-          .map((i) => `${i.path.join(".")}: ${i.message}`)
-          .join("; "),
-      });
+    res.status(400).json({
+      error: err.issues
+        .map((i) => `${i.path.join(".")}: ${i.message}`)
+        .join("; "),
+    });
     return;
   }
   const code =
@@ -857,16 +872,14 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
           ? 400
           : 500);
   if (code === 500) console.error(err);
-  res
-    .status(code)
-    .json({
-      error:
-        code === 500
-          ? "Erro interno. Tente novamente."
-          : err.code === "P2002"
-            ? "Registro já existe (e-mail ou avaliação duplicada)."
-            : err.code
-              ? "Registro inválido ou inexistente."
-              : err.message,
-    });
+  res.status(code).json({
+    error:
+      code === 500
+        ? "Erro interno. Tente novamente."
+        : err.code === "P2002"
+          ? "Registro já existe (e-mail ou avaliação duplicada)."
+          : err.code
+            ? "Registro inválido ou inexistente."
+            : err.message,
+  });
 });

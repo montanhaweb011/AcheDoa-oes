@@ -30,6 +30,8 @@ import {
   Check,
   Clock,
   SlidersHorizontal,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { api } from "./api";
 import Map from "./Map";
@@ -174,6 +176,31 @@ export function PointCard({
     </article>
   );
 }
+function ThemeToggle() {
+  const [theme, setTheme] = useState(() =>
+    document.documentElement.dataset.theme === "dark" ? "dark" : "light",
+  );
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem("achedoacoes-theme", theme);
+    } catch {
+      /* Private browsing may disable storage. */
+    }
+  }, [theme]);
+  return (
+    <button
+      type="button"
+      className="theme-toggle"
+      aria-label={theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro"}
+      aria-pressed={theme === "dark"}
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+    >
+      {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+      <span>{theme === "dark" ? "Modo claro" : "Modo escuro"}</span>
+    </button>
+  );
+}
 function Header() {
   const { user } = useContext(Auth);
   const [open, setOpen] = useState(false);
@@ -188,6 +215,7 @@ function Header() {
         Ache<span>Doações</span>
         <i>®</i>
       </Link>
+      <ThemeToggle />
       <button
         className="mobile icon-button"
         aria-label="Abrir menu"
@@ -330,9 +358,14 @@ function Home() {
             Explorar todos os pontos <ArrowUpRight size={18} />
           </Link>
         </div>
-        <div className="demo-banner">{demoText}</div>
         <State data={data} error={error} />
         <div className="grid three">
+          {data?.total === 0 && (
+            <p>
+              Nenhum ponto aprovado por enquanto. Cadastre sua instituição para
+              começar.
+            </p>
+          )}
           {data?.items?.slice(0, 3).map((p: any) => (
             <PointCard p={p} key={p.id} />
           ))}
@@ -501,7 +534,7 @@ function Points() {
         </form>
         <select
           aria-label="Tipo de dados"
-          value={params.get("mode") || "demo"}
+          value={params.get("mode") || "real"}
           onChange={(e) => set("mode", e.target.value)}
         >
           <option value="demo">Explorar demonstração</option>
@@ -575,7 +608,7 @@ function Points() {
           );
         })}
       </div>
-      {params.get("mode") !== "real" && (
+      {params.get("mode") === "demo" && (
         <div className="demo-banner">{demoText}</div>
       )}
       <Notice message={message} />
@@ -897,13 +930,13 @@ function Campaigns() {
       <h1 className="page-title">Campanhas de arrecadação</h1>
       <select
         aria-label="Tipo de campanha"
-        value={params.get("mode") || "demo"}
+        value={params.get("mode") || "real"}
         onChange={(e) => setParams({ mode: e.target.value })}
       >
         <option value="demo">Campanhas demonstrativas</option>
         <option value="real">Campanhas reais</option>
       </select>
-      {params.get("mode") !== "real" && (
+      {params.get("mode") === "demo" && (
         <div className="demo-banner">
           Campanhas fictícias, sem arrecadação real.
         </div>
@@ -923,7 +956,7 @@ function Campaigns() {
             key={i}
             onClick={() =>
               setParams({
-                mode: params.get("mode") || "demo",
+                mode: params.get("mode") || "real",
                 page: String(i + 1),
               })
             }
@@ -1160,8 +1193,8 @@ function Editorial({ page }: { page: string }) {
             comprovados.
           </p>
           <div className="demo-banner">
-            Este ambiente contém uma base demonstrativa. Não há estatísticas de
-            doações ou parcerias presumidas.
+            Pontos de demonstração, quando selecionados, são fictícios. Confirme
+            horários e condições com a instituição antes de doar.
           </div>
         </>
       ) : (
@@ -1176,9 +1209,10 @@ function Editorial({ page }: { page: string }) {
           <p>
             Um cookie HttpOnly mantém sua sessão por até sete dias. A
             localização só é solicitada ao usar “Perto de mim” e é calculada no
-            navegador, sem armazenamento no servidor. O mapa utiliza Google Maps quando a API está configurada ou
-            OpenStreetMap como alternativa. O provedor do mapa recebe
-            requisições do navegador para exibir a região.
+            navegador, sem armazenamento no servidor. O mapa utiliza Google Maps
+            quando a API está configurada ou OpenStreetMap como alternativa. O
+            provedor do mapa recebe requisições do navegador para exibir a
+            região.
           </p>
           <h2>Ambiente local e contato</h2>
           <p>
@@ -1252,7 +1286,7 @@ export default function App() {
             <Shirt /> AcheDoações
           </Link>
           <p>Conectando roupas a novas histórias.</p>
-          <small>Projeto demonstrativo · Solidariedade e reutilização.</small>
+          <small>Solidariedade e reutilização.</small>
         </div>
         <div>
           <Link to="/pontos">Pontos de doação</Link>

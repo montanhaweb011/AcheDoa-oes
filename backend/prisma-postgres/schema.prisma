@@ -1,0 +1,151 @@
+generator client {
+ provider = "prisma-client-js"
+}
+datasource db {
+ provider = "postgresql"
+ url = env("DATABASE_URL")
+}
+model User {
+ id String @id @default(cuid())
+ name String
+ email String @unique
+ password String
+ role String @default("DONOR")
+ createdAt DateTime @default(now())
+ institution Institution?
+ sessions Session[]
+ favorites Favorite[]
+ reviews Review[]
+ reports InformationReport[]
+ reviewReports ReviewReport[]
+}
+model Session {
+ id String @id
+ userId String
+ csrf String
+ expiresAt DateTime
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ @@index([expiresAt])
+}
+model Institution {
+ id String @id @default(cuid())
+ ownerId String @unique
+ name String
+ description String @default("")
+ status String @default("PENDING")
+ owner User @relation(fields:[ownerId],references:[id],onDelete:Cascade)
+ points CollectionPoint[]
+ campaigns Campaign[]
+}
+model CollectionPoint {
+ id String @id @default(cuid())
+ institutionId String
+ name String
+ description String
+ state String
+ city String
+ neighborhood String
+ street String
+ number String
+ complement String @default("")
+ zip String @default("")
+ latitude Float
+ longitude Float
+ restrictions String @default("")
+ instructions String @default("")
+ phone String @default("")
+ email String @default("")
+ website String @default("")
+ source String @default("")
+ verifiedAt DateTime?
+ status String @default("PENDING")
+ isDemo Boolean @default(false)
+ createdAt DateTime @default(now())
+ institution Institution @relation(fields:[institutionId],references:[id],onDelete:Cascade)
+ categories PointCategory[]
+ hours OpeningHours[]
+ favorites Favorite[]
+ reviews Review[]
+ reports InformationReport[]
+ campaigns Campaign[]
+ @@index([status,isDemo,city])
+}
+model ClothingCategory {
+ id String @id
+ name String @unique
+ points PointCategory[]
+}
+model PointCategory {
+ pointId String
+ categoryId String
+ point CollectionPoint @relation(fields:[pointId],references:[id],onDelete:Cascade)
+ category ClothingCategory @relation(fields:[categoryId],references:[id])
+ @@id([pointId,categoryId])
+}
+model OpeningHours {
+ id String @id @default(cuid())
+ pointId String
+ day Int
+ opens String
+ closes String
+ point CollectionPoint @relation(fields:[pointId],references:[id],onDelete:Cascade)
+ @@unique([pointId,day])
+}
+model Campaign {
+ approved Boolean @default(false)
+ id String @id @default(cuid())
+ institutionId String
+ pointId String
+ title String
+ description String
+ items String
+ instructions String @default("")
+ startDate DateTime
+ endDate DateTime
+ status String @default("PENDING")
+ isDemo Boolean @default(false)
+ institution Institution @relation(fields:[institutionId],references:[id],onDelete:Cascade)
+ point CollectionPoint @relation(fields:[pointId],references:[id],onDelete:Cascade)
+ @@index([status,startDate,endDate])
+}
+model Favorite {
+ userId String
+ pointId String
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ point CollectionPoint @relation(fields:[pointId],references:[id],onDelete:Cascade)
+ @@id([userId,pointId])
+}
+model Review {
+ id String @id @default(cuid())
+ userId String
+ pointId String
+ rating Int
+ comment String
+ hidden Boolean @default(false)
+ createdAt DateTime @default(now())
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ point CollectionPoint @relation(fields:[pointId],references:[id],onDelete:Cascade)
+ reports ReviewReport[]
+ @@unique([userId,pointId])
+}
+model InformationReport {
+ id String @id @default(cuid())
+ userId String
+ pointId String
+ reason String
+ description String
+ status String @default("PENDING")
+ createdAt DateTime @default(now())
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ point CollectionPoint @relation(fields:[pointId],references:[id],onDelete:Cascade)
+}
+model ReviewReport {
+ id String @id @default(cuid())
+ userId String
+ reviewId String
+ reason String
+ status String @default("PENDING")
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ review Review @relation(fields:[reviewId],references:[id],onDelete:Cascade)
+ @@unique([userId,reviewId])
+}
